@@ -1,422 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Daily Fuel</title>
-<meta name="theme-color" content="#4A7A6D" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Daily Fuel" />
-<link rel="manifest" href="manifest.json" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
-<link rel="icon" href="icon-192.png" />
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
-  :root {
-    --bg: #F6F7F1;
-    --surface: #FFFFFF;
-    --ink: #1F2A24;
-    --ink-soft: #6B7A70;
-    --line: #E3E6DC;
-    --coral: #FF6B4A;
-    --sage: #4A7A6D;
-    --sage-soft: #E7EFE9;
-    --gold: #E8A23D;
-    --gold-soft: #FBF0DD;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); }
-  body {
-    font-family: 'Inter', sans-serif;
-    color: var(--ink);
-    -webkit-tap-highlight-color: transparent;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .ff-display { font-family: 'Fraunces', serif; }
-  .ff-mono { font-family: 'IBM Plex Mono', monospace; }
-  input, select {
-    font-family: 'Inter', sans-serif;
-    background: #FBFBF8;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 14px;
-    color: var(--ink);
-    outline: none;
-    width: 100%;
-    transition: border-color 0.15s ease;
-  }
-  input:focus, select:focus { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-soft); }
-  label { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); display:block; margin-bottom: 5px; letter-spacing: 0.01em; }
-  button { font-family: 'Inter', sans-serif; cursor: pointer; }
-  .btn-primary {
-    background: var(--ink); color: #fff; border: none; border-radius: 10px;
-    padding: 12px 18px; font-weight: 600; font-size: 14px;
-    transition: opacity 0.15s ease, transform 0.1s ease;
-  }
-  .btn-primary:hover { opacity: 0.88; }
-  .btn-primary:active { transform: scale(0.98); }
-  .btn-primary:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
-  .icon-btn {
-    background: transparent; border: none; color: var(--ink-soft);
-    border-radius: 8px; padding: 6px; display:flex; align-items:center; justify-content:center;
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .icon-btn:hover { background: #F1F2EC; color: var(--coral); }
-  .icon-btn:focus-visible { outline: 2px solid var(--sage); outline-offset: 1px; }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
-  .grid2 { display: grid; grid-template-columns: 1fr; gap: 20px; }
-  @media (min-width: 720px) { .grid2 { grid-template-columns: 1fr 1fr; } }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
-  .spin { animation: spin 0.9s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-</style>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="root"></div>
+<div class="wrap">
+<h1>Daily Fuel</h1>
 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<div class="card">
+<h2>Profile</h2>
+<div class="grid">
+<input id="age" type="number" placeholder="Age">
+<input id="height" type="number" placeholder="Height (cm)">
+<input id="weight" type="number" placeholder="Weight (kg)">
+<select id="goal">
+<option value="lose">Lose Weight</option>
+<option value="maintain">Maintain</option>
+<option value="gain">Gain Weight</option>
+</select>
+</div>
+<button onclick="saveProfile()">Save</button>
+</div>
 
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo } = React;
+<div class="stats">
+<div class="card"><h3>Maintenance</h3><p id="maintenance">0</p></div>
+<div class="card"><h3>Target</h3><p id="target">0</p></div>
+<div class="card"><h3>Calories</h3><p id="calories">0</p></div>
+<div class="card"><h3>Protein</h3><p id="protein">0g</p></div>
+</div>
 
-/* ---------- tiny inline icons (no external icon library needed) ---------- */
-const Icon = ({ children, size = 16, style }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>{children}</svg>
-);
-const Flame = (p) => <Icon {...p}><path d="M8.5 14.5A2.5 2.5 0 0011 17a2.5 2.5 0 002.5-2.5c0-1.5-1.5-2-1.5-4 0-1 .5-2 1-3 .8 1 2 3 2 5.5A5 5 0 0110 17a5 5 0 01-4-8c.5 2 1 3 2.5 3.5z"/></Icon>;
-const Plus = (p) => <Icon {...p}><path d="M12 5v14M5 12h14"/></Icon>;
-const Trash2 = (p) => <Icon {...p}><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0-1 14a1 1 0 01-1 1H7a1 1 0 01-1-1L5 6"/></Icon>;
-const Dumbbell = (p) => <Icon {...p}><path d="M6.5 6.5l11 11M5 8l3-3M16 19l3-3M3 10l2-2M19 16l2-2M7 5l2-2 2 2M15 17l2 2 2-2"/></Icon>;
-const UtensilsCrossed = (p) => <Icon {...p}><path d="M11 9 4 16l1.5 1.5L13 10M9.5 5.5 16 12M21 21l-7-7M16 3l-3 3 5 5 3-3z"/></Icon>;
-const Pencil = (p) => <Icon {...p}><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></Icon>;
-const Loader2 = (p) => <Icon {...p} style={{...(p.style||{}), display:"inline-block"}}><path className="spin-path" d="M21 12a9 9 0 1 1-9-9"/></Icon>;
+<div class="card">
+<h2>Add Food</h2>
+<input id="search" placeholder="Search food..." oninput="filterFoods()">
+<select id="food"></select>
+<input id="qty" type="number" value="1" min="1">
+<button onclick="addFood()">Add Food</button>
+<ul id="foodlog"></ul>
+</div>
 
-/* ---------- constants ---------- */
-const ACTIVITY = {
-  sedentary: { label: "Sedentary — desk job, little exercise", mult: 1.2 },
-  light: { label: "Light — exercise 1–3 days/week", mult: 1.375 },
-  moderate: { label: "Moderate — exercise 3–5 days/week", mult: 1.55 },
-  active: { label: "Active — exercise 6–7 days/week", mult: 1.725 },
-  veryActive: { label: "Very active — hard training + physical job", mult: 1.9 },
-};
-const GOALS = {
-  lose: { label: "Lose weight", adjust: -500 },
-  maintain: { label: "Maintain weight", adjust: 0 },
-  gain: { label: "Gain weight", adjust: 500 },
-};
-const EXERCISES = [
-  { name: "Walking", met: 3.5 }, { name: "Running", met: 9.8 }, { name: "Cycling", met: 7.5 },
-  { name: "Swimming", met: 6.0 }, { name: "Weight training", met: 5.0 }, { name: "Yoga", met: 2.5 },
-  { name: "HIIT", met: 8.0 }, { name: "Dancing", met: 5.5 }, { name: "Sports (general)", met: 7.0 },
-  { name: "Custom", met: null },
-];
-const CUSTOM_INTENSITY = {
-  light: { label: "Light", met: 3 }, moderate: { label: "Moderate", met: 5 }, vigorous: { label: "Vigorous", met: 8 },
-};
-const todayKey = () => new Date().toISOString().slice(0, 10);
-const uid = () => Math.random().toString(36).slice(2, 10);
-function calcBMR({ gender, weight, height, age }) {
-  const base = 10 * weight + 6.25 * height - 5 * age;
-  return gender === "male" ? base + 5 : base - 161;
-}
-
-/* ---------- gauge geometry ---------- */
-function polarToCartesian(cx, cy, r, angleDeg) {
-  const a = ((angleDeg - 90) * Math.PI) / 180;
-  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
-}
-function describeArc(cx, cy, r, startAngle, endAngle) {
-  const start = polarToCartesian(cx, cy, r, startAngle);
-  const end = polarToCartesian(cx, cy, r, endAngle);
-  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`;
-}
-const GAUGE_START = -135, GAUGE_END = 135;
-
-/* ---------- storage (localStorage, persists on this device) ---------- */
-function storageGet(key) {
-  try { const v = localStorage.getItem(key); return Promise.resolve(v ? JSON.parse(v) : null); }
-  catch { return Promise.resolve(null); }
-}
-function storageSet(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { console.error("storage set failed", e); }
-  return Promise.resolve();
-}
-
-/* ---------- main app ---------- */
-function App() {
-  const [booting, setBooting] = useState(true);
-  const [profile, setProfile] = useState(null);
-  const [editingProfile, setEditingProfile] = useState(false);
-  const [foods, setFoods] = useState([]);
-  const [workouts, setWorkouts] = useState([]);
-
-  useEffect(() => {
-    (async () => {
-      const p = await storageGet("profile");
-      if (p) {
-        setProfile(p);
-        setFoods((await storageGet(`food:${todayKey()}`)) || []);
-        setWorkouts((await storageGet(`workout:${todayKey()}`)) || []);
-      }
-      setBooting(false);
-    })();
-  }, []);
-
-  async function handleSaveProfile(p) {
-    setProfile(p); setEditingProfile(false);
-    await storageSet("profile", p);
-  }
-  async function addFood(item) {
-    const next = [...foods, item]; setFoods(next); await storageSet(`food:${todayKey()}`, next);
-  }
-  async function removeFood(id) {
-    const next = foods.filter((f) => f.id !== id); setFoods(next); await storageSet(`food:${todayKey()}`, next);
-  }
-  async function addWorkout(item) {
-    const next = [...workouts, item]; setWorkouts(next); await storageSet(`workout:${todayKey()}`, next);
-  }
-  async function removeWorkout(id) {
-    const next = workouts.filter((w) => w.id !== id); setWorkouts(next); await storageSet(`workout:${todayKey()}`, next);
-  }
-
-  if (booting) {
-    return <Shell><div style={{display:"flex",justifyContent:"center",padding:"120px 0"}}><Loader2 size={28} style={{color:"var(--sage)"}}/></div></Shell>;
-  }
-  if (!profile || editingProfile) {
-    return <Shell><SetupForm initial={profile} onSave={handleSaveProfile} /></Shell>;
-  }
-  return (
-    <Shell>
-      <Dashboard profile={profile} foods={foods} workouts={workouts}
-        onAddFood={addFood} onRemoveFood={removeFood}
-        onAddWorkout={addWorkout} onRemoveWorkout={removeWorkout}
-        onEditProfile={() => setEditingProfile(true)} />
-    </Shell>
-  );
-}
-
-function Shell({ children }) {
-  return <div style={{ minHeight: "100vh" }}>
-    <div style={{ maxWidth: 920, margin: "0 auto", padding: "32px 20px 60px" }}>{children}</div>
-  </div>;
-}
-
-function SetupForm({ initial, onSave }) {
-  const [form, setForm] = useState(initial || {
-    name: "", age: "", gender: "female", height: "", weight: "", activity: "moderate", goal: "maintain",
-  });
-  const [error, setError] = useState("");
-  function update(k, v) { setForm((f) => ({ ...f, [k]: v })); }
-  function handleSubmit(e) {
-    e.preventDefault();
-    const { name, age, height, weight } = form;
-    if (!name.trim() || !age || !height || !weight) { setError("Fill in every field to continue — the numbers feed your calorie calculation."); return; }
-    if (Number(age) <= 0 || Number(height) <= 0 || Number(weight) <= 0) { setError("Age, height, and weight need to be positive numbers."); return; }
-    setError("");
-    onSave({ ...form, age: Number(form.age), height: Number(form.height), weight: Number(form.weight) });
-  }
-  return (
-    <div style={{ maxWidth: 480, margin: "40px auto 0" }}>
-      <div style={{ marginBottom: 28 }}>
-        <div className="ff-mono" style={{ fontSize: 12, letterSpacing: "0.12em", color: "var(--sage)", fontWeight: 600 }}>DAILY FUEL</div>
-        <h1 className="ff-display" style={{ fontSize: 34, fontWeight: 600, margin: "4px 0 6px" }}>{initial ? "Update your details" : "Let's set you up"}</h1>
-        <p style={{ color: "var(--ink-soft)", fontSize: 14.5, lineHeight: 1.5 }}>A few numbers, and we'll work out your maintenance calories — then track what you eat and burn each day.</p>
-      </div>
-      <form onSubmit={handleSubmit} className="card" style={{ display: "grid", gap: 16 }}>
-        <div><label>Name</label><input value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="What should we call you?" /></div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <div><label>Age</label><input type="number" min="1" value={form.age} onChange={(e) => update("age", e.target.value)} placeholder="Years" /></div>
-          <div><label>Gender</label><select value={form.gender} onChange={(e) => update("gender", e.target.value)}><option value="female">Female</option><option value="male">Male</option></select></div>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <div><label>Height (cm)</label><input type="number" min="1" value={form.height} onChange={(e) => update("height", e.target.value)} placeholder="e.g. 165" /></div>
-          <div><label>Weight (kg)</label><input type="number" min="1" value={form.weight} onChange={(e) => update("weight", e.target.value)} placeholder="e.g. 62" /></div>
-        </div>
-        <div><label>Activity level</label><select value={form.activity} onChange={(e) => update("activity", e.target.value)}>{Object.entries(ACTIVITY).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></div>
-        <div><label>Goal</label><select value={form.goal} onChange={(e) => update("goal", e.target.value)}>{Object.entries(GOALS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></div>
-        {error && <div style={{ color: "var(--coral)", fontSize: 13.5, fontWeight: 500 }}>{error}</div>}
-        <button type="submit" className="btn-primary" style={{ marginTop: 4 }}>{initial ? "Save changes" : "Start tracking"}</button>
-      </form>
-    </div>
-  );
-}
-
-function Dashboard({ profile, foods, workouts, onAddFood, onRemoveFood, onAddWorkout, onRemoveWorkout, onEditProfile }) {
-  const bmr = calcBMR(profile);
-  const maintenance = Math.round(bmr * ACTIVITY[profile.activity].mult);
-  const target = Math.round(maintenance + GOALS[profile.goal].adjust);
-  const eaten = useMemo(() => foods.reduce((s, f) => s + Number(f.calories || 0), 0), [foods]);
-  const burned = useMemo(() => workouts.reduce((s, w) => s + Number(w.calories || 0), 0), [workouts]);
-  const allowance = target + burned;
-  const remaining = allowance - eaten;
-  const pct = allowance > 0 ? Math.min(eaten / allowance, 1) : 0;
-  const over = remaining < 0;
-  const greetHour = new Date().getHours();
-  const greeting = greetHour < 12 ? "Good morning" : greetHour < 18 ? "Good afternoon" : "Good evening";
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
-        <div>
-          <div className="ff-mono" style={{ fontSize: 11.5, letterSpacing: "0.12em", color: "var(--sage)", fontWeight: 600 }}>DAILY FUEL</div>
-          <h1 className="ff-display" style={{ fontSize: 28, fontWeight: 600, margin: "2px 0 0" }}>{greeting}, {profile.name.split(" ")[0]}</h1>
-        </div>
-        <button className="icon-btn" onClick={onEditProfile} title="Edit profile" aria-label="Edit profile"><Pencil size={18} /></button>
-      </div>
-      <GaugeCard maintenance={maintenance} target={target} burned={burned} eaten={eaten} remaining={remaining} pct={pct} over={over} />
-      <div className="grid2" style={{ marginTop: 20 }}>
-        <FoodCard foods={foods} eaten={eaten} onAdd={onAddFood} onRemove={onRemoveFood} />
-        <WorkoutCard workouts={workouts} weight={profile.weight} burned={burned} onAdd={onAddWorkout} onRemove={onRemoveWorkout} />
-      </div>
-    </div>
-  );
-}
-
-function GaugeCard({ maintenance, target, burned, eaten, remaining, pct, over }) {
-  const cx = 150, cy = 140, r = 118, sw = 18;
-  const trackD = describeArc(cx, cy, r, GAUGE_START, GAUGE_END);
-  const color = over ? "var(--coral)" : "var(--sage)";
-  return (
-    <div className="card" style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "center" }}>
-      <div style={{ flex: "0 0 auto", margin: "0 auto" }}>
-        <svg viewBox="0 0 300 200" width="300" height="200">
-          <path d={trackD} fill="none" stroke="#EDEFE7" strokeWidth={sw} strokeLinecap="round" pathLength="100" />
-          <path d={trackD} fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" pathLength="100"
-            strokeDasharray={`${pct * 100} 100`} style={{ transition: "stroke-dasharray 0.4s ease, stroke 0.3s ease" }} />
-          <text x="150" y="128" textAnchor="middle" className="ff-display" style={{ fontSize: 40, fontWeight: 600, fill: "var(--ink)" }}>{Math.abs(remaining)}</text>
-          <text x="150" y="154" textAnchor="middle" className="ff-mono" style={{ fontSize: 12, fill: "var(--ink-soft)", letterSpacing: "0.06em" }}>{over ? "KCAL OVER" : "KCAL LEFT"}</text>
-        </svg>
-      </div>
-      <div style={{ flex: "1 1 220px", display: "grid", gap: 12 }}>
-        <Stat icon={<Flame size={15} />} label="Maintenance" value={`${maintenance} kcal/day`} sub="At your current activity level" />
-        <Stat label="Today's target" value={`${target} kcal`} accent="var(--sage)" />
-        <div style={{ display: "flex", gap: 16 }}>
-          <Stat compact label="Eaten" value={`${eaten}`} accent="var(--coral)" />
-          <Stat compact label="Burned" value={`+${burned}`} accent="var(--gold)" />
-        </div>
-      </div>
-    </div>
-  );
-}
-function Stat({ icon, label, value, sub, accent, compact }) {
-  return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--ink-soft)", fontSize: 12.5, fontWeight: 600, marginBottom: 2 }}>{icon}{label}</div>
-      <div className="ff-mono" style={{ fontSize: compact ? 20 : 22, fontWeight: 600, color: accent || "var(--ink)" }}>{value}</div>
-      {sub && <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>{sub}</div>}
-    </div>
-  );
-}
-
-function FoodCard({ foods, eaten, onAdd, onRemove }) {
-  const [name, setName] = useState(""), [qty, setQty] = useState(""), [cal, setCal] = useState(""), [error, setError] = useState("");
-  function submit(e) {
-    e.preventDefault();
-    if (!name.trim() || !cal) { setError("Add a food name and its calories."); return; }
-    setError(""); onAdd({ id: uid(), name: name.trim(), qty: qty.trim(), calories: Number(cal) });
-    setName(""); setQty(""); setCal("");
-  }
-  return (
-    <div className="card">
-      <CardHeader icon={<UtensilsCrossed size={17} color="var(--coral)" />} title="Today's food" sub={`${eaten} kcal logged`} />
-      <form onSubmit={submit} style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 0.8fr auto", gap: 8, marginBottom: 14, alignItems: "end" }}>
-        <div><label>Item</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Paneer wrap" /></div>
-        <div><label>Quantity</label><input value={qty} onChange={(e) => setQty(e.target.value)} placeholder="1 bowl" /></div>
-        <div><label>Kcal</label><input type="number" min="0" value={cal} onChange={(e) => setCal(e.target.value)} placeholder="320" /></div>
-        <button type="submit" className="btn-primary" style={{ padding: 10 }} aria-label="Add food item"><Plus size={16} /></button>
-      </form>
-      {error && <div style={{ color: "var(--coral)", fontSize: 13, marginBottom: 10 }}>{error}</div>}
-      <ItemList items={foods} empty="Nothing logged yet. Add what you've eaten to start tracking." onRemove={onRemove}
-        renderRight={(f) => <span className="ff-mono" style={{ fontWeight: 600, color: "var(--coral)" }}>{f.calories} kcal</span>}
-        renderSub={(f) => f.qty} />
-    </div>
-  );
-}
-
-function WorkoutCard({ workouts, weight, burned, onAdd, onRemove }) {
-  const [exercise, setExercise] = useState(EXERCISES[0].name);
-  const [intensity, setIntensity] = useState("moderate");
-  const [customName, setCustomName] = useState("");
-  const [duration, setDuration] = useState("");
-  const [error, setError] = useState("");
-  const isCustom = exercise === "Custom";
-  const met = isCustom ? CUSTOM_INTENSITY[intensity].met : EXERCISES.find((e) => e.name === exercise).met;
-  const preview = duration ? Math.round((met * 3.5 * weight) / 200 * Number(duration)) : 0;
-  function submit(e) {
-    e.preventDefault();
-    if (!duration || Number(duration) <= 0) { setError("Add how many minutes you trained."); return; }
-    if (isCustom && !customName.trim()) { setError("Give your custom workout a name."); return; }
-    setError("");
-    onAdd({ id: uid(), name: isCustom ? customName.trim() : exercise, duration: Number(duration), calories: preview });
-    setDuration(""); setCustomName("");
-  }
-  return (
-    <div className="card">
-      <CardHeader icon={<Dumbbell size={17} color="var(--gold)" />} title="Today's workout" sub={`${burned} kcal burned`} />
-      <form onSubmit={submit} style={{ display: "grid", gap: 8, marginBottom: 14 }}>
-        <div style={{ display: "grid", gridTemplateColumns: isCustom ? "1fr 1fr" : "1fr", gap: 8 }}>
-          <div><label>Exercise</label><select value={exercise} onChange={(e) => setExercise(e.target.value)}>{EXERCISES.map((ex) => <option key={ex.name} value={ex.name}>{ex.name}</option>)}</select></div>
-          {isCustom && <div><label>Intensity</label><select value={intensity} onChange={(e) => setIntensity(e.target.value)}>{Object.entries(CUSTOM_INTENSITY).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></div>}
-        </div>
-        {isCustom && <div><label>Name it</label><input value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="e.g. Badminton" /></div>}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, alignItems: "end" }}>
-          <div><label>Minutes</label><input type="number" min="1" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="30" /></div>
-          <button type="submit" className="btn-primary" style={{ padding: 10 }} aria-label="Add workout"><Plus size={16} /></button>
-        </div>
-        {duration > 0 && <div style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>Rough estimate: <span className="ff-mono" style={{ color: "var(--gold)", fontWeight: 600 }}>~{preview} kcal</span></div>}
-        {error && <div style={{ color: "var(--coral)", fontSize: 13 }}>{error}</div>}
-      </form>
-      <ItemList items={workouts} empty="No workouts yet today. Log one to see calories burned." onRemove={onRemove}
-        renderRight={(w) => <span className="ff-mono" style={{ fontWeight: 600, color: "var(--gold)" }}>~{w.calories} kcal</span>}
-        renderSub={(w) => `${w.duration} min`} />
-    </div>
-  );
-}
-
-function CardHeader({ icon, title, sub }) {
-  return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>{icon}<h2 style={{ fontSize: 15.5, fontWeight: 700 }}>{title}</h2></div>
-      <span className="ff-mono" style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{sub}</span>
-    </div>
-  );
-}
-function ItemList({ items, empty, onRemove, renderRight, renderSub }) {
-  if (items.length === 0) return <div style={{ fontSize: 13.5, color: "var(--ink-soft)", padding: "10px 2px" }}>{empty}</div>;
-  return (
-    <div style={{ display: "grid", gap: 6, maxHeight: 220, overflowY: "auto" }}>
-      {items.map((it) => (
-        <div key={it.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 10px", borderRadius: 10, background: "#FBFBF8", border: "1px solid var(--line)" }}>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.name}</div>
-            <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>{renderSub(it)}</div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            {renderRight(it)}
-            <button className="icon-btn" onClick={() => onRemove(it.id)} aria-label={`Remove ${it.name}`}><Trash2 size={14} /></button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-</script>
-
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").catch(() => {});
-    });
-  }
-</script>
+<div class="card">
+<h2>Workout</h2>
+<input id="workout" placeholder="Workout">
+<input id="minutes" type="number" placeholder="Minutes">
+<button onclick="addWorkout()">Add Workout</button>
+<ul id="workoutlog"></ul>
+</div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
