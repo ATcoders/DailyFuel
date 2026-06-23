@@ -1,55 +1,206 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Fuel</title>
+
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
+
+<meta name="theme-color" content="#111827">
 </head>
+
 <body>
+
 <div class="wrap">
-<h1>Daily Fuel</h1>
+
+<h1>🔥 Daily Fuel</h1>
 
 <div class="card">
+
 <h2>Profile</h2>
+
 <div class="grid">
-<input id="age" type="number" placeholder="Age">
-<input id="height" type="number" placeholder="Height (cm)">
-<input id="weight" type="number" placeholder="Weight (kg)">
+
+<input
+id="age"
+type="number"
+placeholder="Age">
+
+<input
+id="height"
+type="number"
+placeholder="Height (cm)">
+
+<input
+id="weight"
+type="number"
+placeholder="Weight (kg)">
+
+<select id="gender">
+<option value="male">Male</option>
+<option value="female">Female</option>
+</select>
+
+<select id="activity">
+<option value="1.2">Sedentary</option>
+<option value="1.375">Lightly Active</option>
+<option value="1.55" selected>Moderately Active</option>
+<option value="1.725">Very Active</option>
+<option value="1.9">Athlete</option>
+</select>
+
 <select id="goal">
 <option value="lose">Lose Weight</option>
-<option value="maintain">Maintain</option>
+<option value="maintain">Maintain Weight</option>
 <option value="gain">Gain Weight</option>
 </select>
+
 </div>
-<button onclick="saveProfile()">Save</button>
+
+<button onclick="saveProfile()">
+Save Profile
+</button>
+
 </div>
 
 <div class="stats">
-<div class="card"><h3>Maintenance</h3><p id="maintenance">0</p></div>
-<div class="card"><h3>Target</h3><p id="target">0</p></div>
-<div class="card"><h3>Calories</h3><p id="calories">0</p></div>
-<div class="card"><h3>Protein</h3><p id="protein">0g</p></div>
+
+<div class="card">
+<h3>Maintenance Calories</h3>
+<p id="maintenance">0</p>
 </div>
 
 <div class="card">
-<h2>Add Food</h2>
-<input id="search" placeholder="Search food..." oninput="filterFoods()">
+<h3>Target Calories</h3>
+<p id="target">0</p>
+</div>
+
+<div class="card">
+<h3>Calories Consumed</h3>
+<p id="calories">0</p>
+</div>
+
+<div class="card">
+<h3>Protein Consumed</h3>
+<p id="protein">0g</p>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🍽 Add Food</h2>
+
+<input
+id="search"
+placeholder="Search Food..."
+oninput="filterFoods()">
+
 <select id="food"></select>
-<input id="qty" type="number" value="1" min="1">
-<button onclick="addFood()">Add Food</button>
+
+<input
+id="qty"
+type="number"
+value="1"
+min="1"
+placeholder="Quantity">
+
+<button onclick="addFood()">
+Add Food
+</button>
+
 <ul id="foodlog"></ul>
+
 </div>
 
 <div class="card">
-<h2>Workout</h2>
-<input id="workout" placeholder="Workout">
-<input id="minutes" type="number" placeholder="Minutes">
-<button onclick="addWorkout()">Add Workout</button>
+
+<h2>🏋 Workout Tracker</h2>
+
+<input
+id="workoutSearch"
+placeholder="Search Workout..."
+oninput="filterWorkout()">
+
+<select
+id="workout"
+onchange="updateWorkoutInputs()"> </select>
+
+<div
+id="gymInputs"
+style="display:none;">
+
+<input
+id="sets"
+type="number"
+placeholder="Sets">
+
+<input
+id="reps"
+type="number"
+placeholder="Reps">
+
+<input
+id="gymWeight"
+type="number"
+placeholder="Weight Used (kg)">
+
+</div>
+
+<div
+id="cardioInputs">
+
+<input
+id="minutes"
+type="number"
+placeholder="Minutes">
+
+</div>
+
+<button onclick="addWorkout()">
+Add Workout
+</button>
+
 <ul id="workoutlog"></ul>
+
 </div>
+
+<div class="card">
+
+<h2>📋 Food Quantity Guide</h2>
+
+<ul>
+
+<li>Rice → Quantity = number of 100g servings</li>
+
+<li>Dal → Quantity = number of 100g servings</li>
+
+<li>Milk → Quantity = number of 100ml servings</li>
+
+<li>Chapati → Quantity = number of chapatis</li>
+
+<li>Egg → Quantity = number of eggs</li>
+
+<li>Chicken → Quantity = number of 100g servings</li>
+
+<li>Protein Shake → Quantity = number of glasses</li>
+
+<li>Tea/Coffee → Quantity = number of cups</li>
+
+<li>Pizza → Quantity = number of slices</li>
+
+<li>Burger → Quantity = number of burgers</li>
+
+</ul>
+
 </div>
+
+</div>
+
 <script src="script.js"></script>
+
 </body>
 </html>
